@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Coins, Menu } from 'lucide-react';
+import { Coins } from 'lucide-react';
 export default function Navigation() {
   const location = useLocation();
 
