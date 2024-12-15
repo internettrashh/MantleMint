@@ -10,20 +10,29 @@ import "./BondedToken.sol";
 
 contract TokenFactory is Ownable {
     enum CurveType { LINEAR, EXPONENTIAL, LOGARITHMIC, SIGMOID }
-    
-    struct TokenInfo {
+
+    struct BasicTokenInfo {
         address tokenAddress;
         string name;
         string symbol;
         string description;
         CurveType curveType;
         address curveAddress;
+        address paymentToken;
         uint256 createdAt;
         address creator;
     }
 
-    mapping(address => TokenInfo[]) public creatorTokens;
-    TokenInfo[] public allTokens;
+    struct CreatorInfo {
+        string twitchUsername;
+        string[] socialLinks;
+        string profileImageUrl;
+        string category;
+    }
+    
+    mapping(address => BasicTokenInfo[]) public creatorTokens;
+    mapping(address => CreatorInfo) public creatorProfiles;
+    BasicTokenInfo[] public allTokens;
     
     event TokenCreated(
         address indexed tokenAddress,
@@ -36,45 +45,39 @@ contract TokenFactory is Ownable {
     constructor() Ownable(msg.sender) {}
 
     function createToken(
-        string memory name,
-        string memory symbol,
-        string memory description,
-        CurveType curveType,
-        uint256 param1,  // slope/exponent/multiplier/steepness
-        uint256 param2   // optional: midpoint for sigmoid
+        BasicTokenInfo memory basicInfo,
+        CreatorInfo memory creatorInfo,
+        uint256 param1,
+        uint256 param2
     ) external returns (address) {
-        // Deploy the chosen bonding curve
-        address curveAddress = _deployCurve(curveType, param1, param2);
+        require(bytes(creatorInfo.twitchUsername).length > 0, "Twitch username required");
+        require(creatorInfo.socialLinks.length <= 5, "Too many social links");
         
-        // Deploy the bonded token
+        address curveAddress = _deployCurve(basicInfo.curveType, param1, param2);
+        
         BondedToken token = new BondedToken(
-            name,
-            symbol,
+            basicInfo.name,
+            basicInfo.symbol,
             curveAddress,
+            basicInfo.paymentToken,
             msg.sender
         );
 
-        // Store token information
-        TokenInfo memory newToken = TokenInfo({
-            tokenAddress: address(token),
-            name: name,
-            symbol: symbol,
-            description: description,
-            curveType: curveType,
-            curveAddress: curveAddress,
-            createdAt: block.timestamp,
-            creator: msg.sender
-        });
+        basicInfo.tokenAddress = address(token);
+        basicInfo.curveAddress = curveAddress;
+        basicInfo.createdAt = block.timestamp;
+        basicInfo.creator = msg.sender;
 
-        creatorTokens[msg.sender].push(newToken);
-        allTokens.push(newToken);
+        creatorTokens[msg.sender].push(basicInfo);
+        allTokens.push(basicInfo);
+        creatorProfiles[msg.sender] = creatorInfo;
 
         emit TokenCreated(
             address(token),
             msg.sender,
-            name,
-            symbol,
-            curveType
+            basicInfo.name,
+            basicInfo.symbol,
+            basicInfo.curveType
         );
 
         return address(token);
@@ -105,11 +108,11 @@ contract TokenFactory is Ownable {
     }
 
     // View functions
-    function getTokensByCreator(address creator) external view returns (TokenInfo[] memory) {
+    function getTokensByCreator(address creator) external view returns (BasicTokenInfo[] memory) {
         return creatorTokens[creator];
     }
 
-    function getAllTokens() external view returns (TokenInfo[] memory) {
+    function getAllTokens() external view returns (BasicTokenInfo[] memory) {
         return allTokens;
     }
 

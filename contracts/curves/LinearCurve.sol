@@ -5,7 +5,7 @@ import "../interfaces/IBondingCurve.sol";
 
 contract LinearCurve is IBondingCurve {
     uint256 public constant PRECISION = 1e18;
-    uint256 public constant BASE_PRICE = 10000000000000; // 0.00001 ether
+    uint256 public constant BASE_PRICE = 100_000_000_000_000_000; // 0.1 * 10^18
     uint256 public slope;
     
     uint256 public totalVolume;

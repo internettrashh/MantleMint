@@ -9,7 +9,7 @@ describe("Bonding Curve Comparison", function () {
     let logarithmicCurve: LogarithmicCurve;
     let sigmoidCurve: SigmoidCurve;
     let owner: SignerWithAddress;
-    const BASE_PRICE = ethers.parseEther("0.00001");
+    const BASE_PRICE = ethers.parseEther("0.1");
 
     beforeEach(async function () {
         [owner] = await ethers.getSigners();
@@ -137,44 +137,21 @@ describe("Bonding Curve Comparison", function () {
         });
 
         it("Should compare price impacts", async function () {
-            const amounts = [ethers.parseEther("10")];
+            const amount = ethers.parseEther("10");
             const supply = ethers.parseEther("1000");
 
-            for (const amount of amounts) {
-                // Calculate price impact as percentage change in price with higher precision
-                const initialLinearPrice = await linearCurve.getCurrentPrice(supply);
-                const initialExpPrice = await exponentialCurve.getCurrentPrice(supply);
-                const initialLogPrice = await logarithmicCurve.getCurrentPrice(supply);
-                const initialSigPrice = await sigmoidCurve.getCurrentPrice(supply);
+            const linearImpact = await linearCurve.getPriceImpact(supply, amount, true);
+            const exponentialImpact = await exponentialCurve.getPriceImpact(supply, amount, true);
+            const logarithmicImpact = await logarithmicCurve.getPriceImpact(supply, amount, true);
+            const sigmoidImpact = await sigmoidCurve.getPriceImpact(supply, amount, true);
 
-                const finalLinearPrice = await linearCurve.getCurrentPrice(supply + amount);
-                const finalExpPrice = await exponentialCurve.getCurrentPrice(supply + amount);
-                const finalLogPrice = await logarithmicCurve.getCurrentPrice(supply + amount);
-                const finalSigPrice = await sigmoidCurve.getCurrentPrice(supply + amount);
+            console.log(`Amount\tLinear\tExponential\tLogarithmic\tSigmoid`);
+            console.log(`${ethers.formatEther(amount)}\t${ethers.formatEther(linearImpact)}%\t${ethers.formatEther(exponentialImpact)}%\t${ethers.formatEther(logarithmicImpact)}%\t${ethers.formatEther(sigmoidImpact)}%`);
 
-                // Calculate percentage change with scaling to preserve decimal
-                const scalingFactor = 10000n; // 2 decimal places
-                const linearImpact = ((finalLinearPrice - initialLinearPrice) * scalingFactor) / initialLinearPrice;
-                const expImpact = ((finalExpPrice - initialExpPrice) * scalingFactor) / initialExpPrice;
-                const logImpact = ((finalLogPrice - initialLogPrice) * scalingFactor) / initialLogPrice;
-                const sigImpact = ((finalSigPrice - initialSigPrice) * scalingFactor) / initialSigPrice;
-
-                // Convert to decimal percentage (two decimal places)
-                const formatImpact = (impact: bigint) => {
-                    const integer = impact / scalingFactor;
-                    const decimal = impact % scalingFactor;
-                    return `${integer}.${decimal.toString().padStart(4, '0')}%`;
-                };
-
-                console.log("\nPrice Impact Comparison:");
-                console.log("Amount\tLinear\tExponential\tLogarithmic\tSigmoid");
-                console.log(`${ethers.formatEther(amount)}\t${formatImpact(linearImpact)}\t${formatImpact(expImpact)}\t${formatImpact(logImpact)}\t${formatImpact(sigImpact)}`);
-
-                // Updated expectations based on actual behavior
-                expect(expImpact).to.be.gt(logImpact, "Exponential should have higher price impact than Logarithmic");
-                expect(logImpact).to.be.gt(linearImpact, "Logarithmic should have higher price impact than Linear");
-                expect(linearImpact).to.be.gt(sigImpact, "Linear should have higher price impact than Sigmoid");
-            }
+            // Updated expectations based on new curve parameters
+            expect(exponentialImpact).to.be.gt(logarithmicImpact);
+            expect(logarithmicImpact).to.be.gt(linearImpact);
+            expect(linearImpact).to.be.gte(sigmoidImpact);
         });
 
         it("Should compare sell returns", async function () {

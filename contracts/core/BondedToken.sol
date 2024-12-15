@@ -2,66 +2,73 @@
 pragma solidity ^0.8.27;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/IBondingCurve.sol";
 
 contract BondedToken is ERC20, Ownable {
     IBondingCurve public bondingCurve;
-    uint256 public constant PRECISION = 1e18;
+    IERC20 public paymentToken;
+    bool public isNativePayment;
 
-    event TokensPurchased(address indexed buyer, uint256 ethAmount, uint256 tokenAmount);
-    event TokensSold(address indexed seller, uint256 tokenAmount, uint256 ethAmount);
+    event Buy(address indexed buyer, uint256 amount, uint256 payment);
+    event Sell(address indexed seller, uint256 amount, uint256 payment);
 
     constructor(
         string memory name,
         string memory symbol,
-        address curveAddress,
+        address _bondingCurve,
+        address _paymentToken,
         address initialOwner
     ) ERC20(name, symbol) Ownable(initialOwner) {
-        bondingCurve = IBondingCurve(curveAddress);
+        bondingCurve = IBondingCurve(_bondingCurve);
+        isNativePayment = _paymentToken == address(0);
+        if (!isNativePayment) {
+            paymentToken = IERC20(_paymentToken);
+        }
     }
 
-    function buy() external payable {
-        require(msg.value > 0, "Must send ETH");
+    function buy(uint256 amount) external payable {
+        uint256 price = bondingCurve.calculatePurchaseReturn(totalSupply(), amount);
         
-        uint256 tokensToMint = bondingCurve.calculatePurchaseReturn(
-            totalSupply(),
-            msg.value
-        );
-        
-        require(tokensToMint > 0, "Zero tokens");
-        _mint(msg.sender, tokensToMint);
-        
-        emit TokensPurchased(msg.sender, msg.value, tokensToMint);
+        if (isNativePayment) {
+            require(msg.value >= price, "Insufficient payment");
+            
+            if (msg.value > price) {
+                (bool success, ) = msg.sender.call{value: msg.value - price}("");
+                require(success, "Refund failed");
+            }
+        } else {
+            require(paymentToken.transferFrom(msg.sender, address(this), price), 
+                "Payment token transfer failed");
+        }
+
+        _mint(msg.sender, amount);
+        emit Buy(msg.sender, amount, price);
     }
 
-    function sell(uint256 tokenAmount) external {
-        require(tokenAmount > 0, "Zero tokens");
-        require(balanceOf(msg.sender) >= tokenAmount, "Insufficient balance");
+    function sell(uint256 amount) external {
+        require(balanceOf(msg.sender) >= amount, "Insufficient balance");
         
-        uint256 ethToReturn = bondingCurve.calculateSaleReturn(
-            totalSupply(),
-            tokenAmount
-        );
-        
-        require(ethToReturn > 0, "Zero ETH return");
-        require(address(this).balance >= ethToReturn, "Insufficient ETH in contract");
-        
-        _burn(msg.sender, tokenAmount);
-        (bool success, ) = msg.sender.call{value: ethToReturn}("");
-        require(success, "ETH transfer failed");
-        
-        emit TokensSold(msg.sender, tokenAmount, ethToReturn);
+        uint256 returnAmount = bondingCurve.calculateSaleReturn(totalSupply(), amount);
+        _burn(msg.sender, amount);
+
+        if (isNativePayment) {
+            (bool success, ) = msg.sender.call{value: returnAmount}("");
+            require(success, "ETH transfer failed");
+        } else {
+            require(paymentToken.transfer(msg.sender, returnAmount), 
+                "Payment token transfer failed");
+        }
+
+        emit Sell(msg.sender, amount, returnAmount);
     }
 
-    function getCurrentPrice() external view returns (uint256) {
-        return bondingCurve.getCurrentPrice(totalSupply());
+    function withdrawStuckTokens(address token, uint256 amount) external onlyOwner {
+        require(!isNativePayment && token != address(paymentToken), 
+            "Cannot withdraw payment token");
+        IERC20(token).transfer(owner(), amount);
     }
 
-    function getPriceImpact(uint256 amount, bool isBuy) external view returns (uint256) {
-        return bondingCurve.getPriceImpact(totalSupply(), amount, isBuy);
-    }
-
-    // Allow contract to receive ETH
     receive() external payable {}
 }

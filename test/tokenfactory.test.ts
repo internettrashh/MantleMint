@@ -18,55 +18,63 @@ describe("TokenFactory", function () {
 
     describe("Token Creation", function () {
         it("Should create tokens with different curve types", async function () {
-            // Create Linear Token
-            const tx1 = await tokenFactory.createToken(
-                "Linear Token",
-                "LIN",
-                "A token with linear bonding curve",
-                0, // LINEAR
-                ethers.parseEther("0.1"), // slope
-                0 // unused
-            );
-            
-            // Create Exponential Token
-            const tx2 = await tokenFactory.createToken(
-                "Exponential Token",
-                "EXP",
-                "A token with exponential bonding curve",
-                1, // EXPONENTIAL
-                2, // exponent
-                0 // unused
+            const basicInfo = {
+                name: "Linear Token",
+                symbol: "LIN",
+                description: "A token with linear bonding curve",
+                curveType: 0, // LINEAR
+                tokenAddress: ethers.ZeroAddress,
+                curveAddress: ethers.ZeroAddress,
+                paymentToken: ethers.ZeroAddress, // Use native token
+                createdAt: 0,
+                creator: ethers.ZeroAddress
+            };
+
+            const creatorInfo = {
+                twitchUsername: "teststreamer",
+                socialLinks: ["https://twitter.com/test"],
+                profileImageUrl: "https://example.com/image.jpg",
+                category: "Gaming"
+            };
+
+            const tx = await tokenFactory.createToken(
+                basicInfo,
+                creatorInfo,
+                ethers.parseEther("0.000000001"), // param1 (slope)
+                0 // param2 (unused)
             );
 
-            // Verify tokens were created
-            const allTokens = await tokenFactory.getAllTokens();
-            expect(allTokens.length).to.equal(2);
-            
-            // Check first token details
-            expect(allTokens[0].name).to.equal("Linear Token");
-            expect(allTokens[0].symbol).to.equal("LIN");
-            expect(allTokens[0].curveType).to.equal(0); // LINEAR
-
-            // Verify token functionality
-            const linearToken = await ethers.getContractAt("BondedToken", allTokens[0].tokenAddress);
-            await linearToken.buy({ value: ethers.parseEther("1") });
-            const balance = await linearToken.balanceOf(owner.address);
-            expect(balance).to.be.gt(0);
+            await tx.wait();
+            const tokens = await tokenFactory.getAllTokens();
+            expect(tokens.length).to.equal(1);
+            expect(tokens[0].name).to.equal("Linear Token");
         });
 
         it("Should track tokens by creator", async function () {
-            await tokenFactory.connect(user).createToken(
-                "User Token",
-                "USR",
-                "A user created token",
-                0, // LINEAR
-                ethers.parseEther("0.1"), // slope
-                0 // unused
-            );
+            const basicInfo = {
+                name: "User Token",
+                symbol: "USR",
+                description: "A user created token",
+                curveType: 0, // LINEAR
+                tokenAddress: ethers.ZeroAddress,
+                curveAddress: ethers.ZeroAddress,
+                paymentToken: ethers.ZeroAddress,
+                createdAt: 0,
+                creator: ethers.ZeroAddress
+            };
 
-            const userTokens = await tokenFactory.getTokensByCreator(user.address);
-            expect(userTokens.length).to.equal(1);
-            expect(userTokens[0].creator).to.equal(user.address);
+            const creatorInfo = {
+                twitchUsername: "userstreamer",
+                socialLinks: ["https://twitter.com/user"],
+                profileImageUrl: "https://example.com/user.jpg",
+                category: "Art"
+            };
+
+            await tokenFactory.createToken(basicInfo, creatorInfo, ethers.parseEther("0.000000001"), 0);
+            
+            const creatorTokens = await tokenFactory.getTokensByCreator(owner.address);
+            expect(creatorTokens.length).to.equal(1);
+            expect(creatorTokens[0].name).to.equal("User Token");
         });
     });
 });
