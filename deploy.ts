@@ -72,8 +72,7 @@ async function main() {
             "SMPL",
             "A sample token with linear bonding curve",
             0, // LINEAR curve
-            ethers.parseEther("0.1"), // basePrice
-            ethers.parseEther("0.1"), // slope
+            ethers.parseEther("0.000000001"),  // slope
             0 // unused parameter
         );
 

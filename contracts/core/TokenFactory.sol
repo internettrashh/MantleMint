@@ -8,7 +8,6 @@ import "../curves/LogarithmicCurve.sol";
 import "../curves/SigmoidCurve.sol";
 import "./BondedToken.sol";
 
-
 contract TokenFactory is Ownable {
     enum CurveType { LINEAR, EXPONENTIAL, LOGARITHMIC, SIGMOID }
     
@@ -41,12 +40,11 @@ contract TokenFactory is Ownable {
         string memory symbol,
         string memory description,
         CurveType curveType,
-        uint256 basePrice,
         uint256 param1,  // slope/exponent/multiplier/steepness
         uint256 param2   // optional: midpoint for sigmoid
     ) external returns (address) {
         // Deploy the chosen bonding curve
-        address curveAddress = _deployCurve(curveType, basePrice, param1, param2);
+        address curveAddress = _deployCurve(curveType, param1, param2);
         
         // Deploy the bonded token
         BondedToken token = new BondedToken(
@@ -84,7 +82,6 @@ contract TokenFactory is Ownable {
 
     function _deployCurve(
         CurveType curveType,
-        uint256 basePrice,
         uint256 param1,
         uint256 param2
     ) internal returns (address) {
@@ -93,15 +90,15 @@ contract TokenFactory is Ownable {
             return address(curve);
         } 
         else if (curveType == CurveType.EXPONENTIAL) {
-            ExponentialCurve curve = new ExponentialCurve(basePrice, param1); // param1 = exponent
+            ExponentialCurve curve = new ExponentialCurve(param1); // param1 = exponent
             return address(curve);
         }
         else if (curveType == CurveType.LOGARITHMIC) {
-            LogarithmicCurve curve = new LogarithmicCurve(basePrice, param1); // param1 = multiplier
+            LogarithmicCurve curve = new LogarithmicCurve(param1); // param1 = multiplier
             return address(curve);
         }
         else if (curveType == CurveType.SIGMOID) {
-            SigmoidCurve curve = new SigmoidCurve(basePrice, param1, param2); // param1 = steepness, param2 = midpoint
+            SigmoidCurve curve = new SigmoidCurve(param1, param2); // param1 = steepness, param2 = midpoint
             return address(curve);
         }
         revert("Invalid curve type");

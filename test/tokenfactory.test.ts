@@ -24,7 +24,6 @@ describe("TokenFactory", function () {
                 "LIN",
                 "A token with linear bonding curve",
                 0, // LINEAR
-                ethers.parseEther("0.1"), // basePrice
                 ethers.parseEther("0.1"), // slope
                 0 // unused
             );
@@ -35,7 +34,6 @@ describe("TokenFactory", function () {
                 "EXP",
                 "A token with exponential bonding curve",
                 1, // EXPONENTIAL
-                ethers.parseEther("0.1"), // basePrice
                 2, // exponent
                 0 // unused
             );
@@ -62,9 +60,8 @@ describe("TokenFactory", function () {
                 "USR",
                 "A user created token",
                 0, // LINEAR
-                ethers.parseEther("0.1"),
-                ethers.parseEther("0.1"),
-                0
+                ethers.parseEther("0.1"), // slope
+                0 // unused
             );
 
             const userTokens = await tokenFactory.getTokensByCreator(user.address);
