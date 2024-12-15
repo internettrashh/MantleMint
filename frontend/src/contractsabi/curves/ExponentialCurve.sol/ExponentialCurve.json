@@ -1,0 +1,291 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "ExponentialCurve",
+  "sourceName": "contracts/curves/ExponentialCurve.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_base",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "oldPrice",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "newPrice",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "PriceUpdate",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "volume",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "isBuy",
+          "type": "bool"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "VolumeUpdate",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "BASE_PRICE",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "PRECISION",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "base",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "supply",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "calculatePurchaseReturn",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "supply",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "calculateSaleReturn",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "supply",
+          "type": "uint256"
+        }
+      ],
+      "name": "getCurrentPrice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getPrecision",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "supply",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "isBuy",
+          "type": "bool"
+        }
+      ],
+      "name": "getPriceImpact",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getSlope",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "supply",
+          "type": "uint256"
+        }
+      ],
+      "name": "getSpotPrice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "lastPrice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "lastUpdateTime",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalVolume",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6080604052348015600f57600080fd5b50604051610558380380610558833981016040819052602c91604e565b6036816103e86066565b600055504260035567016345785d8a0000600255608c565b600060208284031215605f57600080fd5b5051919050565b80820180821115608657634e487b7160e01b600052601160045260246000fd5b92915050565b6104bd8061009b6000396000f3fe608060405234801561001057600080fd5b50600436106100cf5760003560e01c806379c84f9c1161008c578063ace4e82411610066578063ace4e8241461015f578063c55d0f5614610102578063c8f33c9114610172578063f86325ed1461017b57600080fd5b806379c84f9c1461013a5780639670c0bc14610142578063aaf5eb681461015057600080fd5b8063053f14da146100d4578063071f8521146100ef5780630fda366d1461010257806341244829146101155780635001f3b5146101285780635f81a57c14610131575b600080fd5b6100dd60025481565b60405190815260200160405180910390f35b6100dd6100fd366004610399565b61018a565b6100dd6101103660046103bb565b61022e565b6100dd6101233660046103d4565b610239565b6100dd60005481565b6100dd60015481565b6000546100dd565b670de0b6b3a76400006100dd565b6100dd670de0b6b3a764000081565b6100dd61016d366004610399565b6102e5565b6100dd60035481565b6100dd67016345785d8a000081565b60008183116101d25760405162461bcd60e51b815260206004820152601060248201526f416d6f756e7420746f6f206c6172676560801b604482015260640160405180910390fd5b600060026101e86101e38587610428565b610306565b6101f186610306565b6101fb919061043b565b610205919061044e565b9050670de0b6b3a764000061021a8285610470565b610224919061044e565b9150505b92915050565b600061022882610306565b60008061024585610306565b90506000836102605761025b6101e38688610428565b61026d565b61026d6101e3868861043b565b905083156102b857818111610287576000925050506102de565b81670de0b6b3a764000061029b8284610428565b6102a59190610470565b6102af919061044e565b925050506102de565b8181106102ca576000925050506102de565b81670de0b6b3a764000061029b8383610428565b9392505050565b6000806102f184610306565b90508061021a670de0b6b3a764000085610470565b60008160000361031f575067016345785d8a0000919050565b6000610335670de0b6b3a76400006103e8610470565b670de0b6b3a76400006000548561034c9190610470565b6103569190610470565b610360919061044e565b9050670de0b6b3a764000061037d8267016345785d8a0000610470565b610387919061044e565b6102de9067016345785d8a000061043b565b600080604083850312156103ac57600080fd5b50508035926020909101359150565b6000602082840312156103cd57600080fd5b5035919050565b6000806000606084860312156103e957600080fd5b83359250602084013591506040840135801515811461040757600080fd5b809150509250925092565b634e487b7160e01b600052601160045260246000fd5b8181038181111561022857610228610412565b8082018082111561022857610228610412565b60008261046b57634e487b7160e01b600052601260045260246000fd5b500490565b80820281158282048414176102285761022861041256fea2646970667358221220b4b3cb494f8f90a8e1482406bfb17ceffa4251bc763e8e793c9f9a50aa17851d64736f6c634300081b0033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100cf5760003560e01c806379c84f9c1161008c578063ace4e82411610066578063ace4e8241461015f578063c55d0f5614610102578063c8f33c9114610172578063f86325ed1461017b57600080fd5b806379c84f9c1461013a5780639670c0bc14610142578063aaf5eb681461015057600080fd5b8063053f14da146100d4578063071f8521146100ef5780630fda366d1461010257806341244829146101155780635001f3b5146101285780635f81a57c14610131575b600080fd5b6100dd60025481565b60405190815260200160405180910390f35b6100dd6100fd366004610399565b61018a565b6100dd6101103660046103bb565b61022e565b6100dd6101233660046103d4565b610239565b6100dd60005481565b6100dd60015481565b6000546100dd565b670de0b6b3a76400006100dd565b6100dd670de0b6b3a764000081565b6100dd61016d366004610399565b6102e5565b6100dd60035481565b6100dd67016345785d8a000081565b60008183116101d25760405162461bcd60e51b815260206004820152601060248201526f416d6f756e7420746f6f206c6172676560801b604482015260640160405180910390fd5b600060026101e86101e38587610428565b610306565b6101f186610306565b6101fb919061043b565b610205919061044e565b9050670de0b6b3a764000061021a8285610470565b610224919061044e565b9150505b92915050565b600061022882610306565b60008061024585610306565b90506000836102605761025b6101e38688610428565b61026d565b61026d6101e3868861043b565b905083156102b857818111610287576000925050506102de565b81670de0b6b3a764000061029b8284610428565b6102a59190610470565b6102af919061044e565b925050506102de565b8181106102ca576000925050506102de565b81670de0b6b3a764000061029b8383610428565b9392505050565b6000806102f184610306565b90508061021a670de0b6b3a764000085610470565b60008160000361031f575067016345785d8a0000919050565b6000610335670de0b6b3a76400006103e8610470565b670de0b6b3a76400006000548561034c9190610470565b6103569190610470565b610360919061044e565b9050670de0b6b3a764000061037d8267016345785d8a0000610470565b610387919061044e565b6102de9067016345785d8a000061043b565b600080604083850312156103ac57600080fd5b50508035926020909101359150565b6000602082840312156103cd57600080fd5b5035919050565b6000806000606084860312156103e957600080fd5b83359250602084013591506040840135801515811461040757600080fd5b809150509250925092565b634e487b7160e01b600052601160045260246000fd5b8181038181111561022857610228610412565b8082018082111561022857610228610412565b60008261046b57634e487b7160e01b600052601260045260246000fd5b500490565b80820281158282048414176102285761022861041256fea2646970667358221220b4b3cb494f8f90a8e1482406bfb17ceffa4251bc763e8e793c9f9a50aa17851d64736f6c634300081b0033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
