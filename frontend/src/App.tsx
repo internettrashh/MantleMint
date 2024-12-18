@@ -5,7 +5,7 @@ import Footer from './components/Footer';
 import LandingPage from './components/landing/LandingPage';
 import CreateCoin from './components/CreateCoin';
 import CreatorToken from './components/token/CreatorToken';
-
+import AllTokens from './components/Test';
 export default function App() {
   return (
     <Router>
@@ -16,6 +16,7 @@ export default function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/create" element={<CreateCoin />} />
             <Route path="/token/:tokenId" element={<CreatorToken />} />
+            <Route path="/test" element={<AllTokens />} />
           </Routes>
         </main>
         <Footer />

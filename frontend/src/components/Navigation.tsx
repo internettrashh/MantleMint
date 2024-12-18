@@ -1,6 +1,7 @@
-import React from 'react';
+
 import { Link, useLocation } from 'react-router-dom';
 import { Coins } from 'lucide-react';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 export default function Navigation() {
   const location = useLocation();
 
@@ -40,9 +41,7 @@ export default function Navigation() {
               >
                 Explore
               </Link>
-              <div>
-              
-              </div>
+              <ConnectButton />
             </div>
           </div>
         </div>

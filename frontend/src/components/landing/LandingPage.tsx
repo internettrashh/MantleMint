@@ -1,4 +1,4 @@
-import React from 'react';
+
 import TokenSlider from './TokenSlider';
 import SearchBar from './SearchBar';
 import { Coins } from 'lucide-react';

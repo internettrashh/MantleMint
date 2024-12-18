@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 interface BondingCurveChartProps {
   curveType: 'linear' | 'exponential' | 'logarithmic' | 'sigmoid';

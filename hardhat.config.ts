@@ -6,7 +6,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 // Ensure private key exists
-const PRIVATE_KEY = process.env.PRIVATE_KEY;
+const PRIVATE_KEY = process.env.PRIVATE_KEY || "";
 if (!PRIVATE_KEY) {
   console.warn("⚠️  No PRIVATE_KEY found in .env file, deployment will not work");
 }
@@ -17,8 +17,9 @@ const config: HardhatUserConfig = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200
+        runs: 200,
       },
+      viaIR: true,
     },
   },
   networks: {
@@ -26,12 +27,17 @@ const config: HardhatUserConfig = {
     mantle: {
       url: process.env.MANTLE_RPC_URL || "https://rpc.mantle.xyz",
       chainId: 5000,
-      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : []
+      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+      gas: 20000000,
+      gasPrice: 1000000000,
     },
     mantleSepolia: {
       url: "https://rpc.sepolia.mantle.xyz",
       chainId: 5003,
-      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : []
+      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+      gas: 30000000,
+      gasPrice: 1000000000,
+      timeout: 60000,
     }
   }
 };

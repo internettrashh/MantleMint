@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.27;
+
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/IBondingCurve.sol";
 import "../curves/LinearCurve.sol";
@@ -30,8 +31,13 @@ contract TokenFactory is Ownable {
         string category;
     }
     
+    struct TokenInfo {
+        BasicTokenInfo basicInfo;
+        CreatorInfo creatorInfo;
+    }
+    
     mapping(address => BasicTokenInfo[]) public creatorTokens;
-    mapping(address => CreatorInfo) public creatorProfiles;
+    mapping(address => mapping(string => CreatorInfo)) public creatorProfiles;
     BasicTokenInfo[] public allTokens;
     
     event TokenCreated(
@@ -70,7 +76,7 @@ contract TokenFactory is Ownable {
 
         creatorTokens[msg.sender].push(basicInfo);
         allTokens.push(basicInfo);
-        creatorProfiles[msg.sender] = creatorInfo;
+        creatorProfiles[msg.sender][basicInfo.symbol] = creatorInfo;
 
         emit TokenCreated(
             address(token),
@@ -83,31 +89,31 @@ contract TokenFactory is Ownable {
         return address(token);
     }
 
+
     function _deployCurve(
         CurveType curveType,
         uint256 param1,
         uint256 param2
     ) internal returns (address) {
         if (curveType == CurveType.LINEAR) {
-            LinearCurve curve = new LinearCurve(param1); // param1 = slope
+            LinearCurve curve = new LinearCurve(param1);
             return address(curve);
         } 
         else if (curveType == CurveType.EXPONENTIAL) {
-            ExponentialCurve curve = new ExponentialCurve(param1); // param1 = exponent
+            ExponentialCurve curve = new ExponentialCurve(param1);
             return address(curve);
         }
         else if (curveType == CurveType.LOGARITHMIC) {
-            LogarithmicCurve curve = new LogarithmicCurve(param1); // param1 = multiplier
+            LogarithmicCurve curve = new LogarithmicCurve(param1);
             return address(curve);
         }
         else if (curveType == CurveType.SIGMOID) {
-            SigmoidCurve curve = new SigmoidCurve(param1, param2); // param1 = steepness, param2 = midpoint
+            SigmoidCurve curve = new SigmoidCurve(param1, param2);
             return address(curve);
         }
         revert("Invalid curve type");
     }
 
-    // View functions
     function getTokensByCreator(address creator) external view returns (BasicTokenInfo[] memory) {
         return creatorTokens[creator];
     }
@@ -122,5 +128,26 @@ contract TokenFactory is Ownable {
 
     function getCreatorTokenCount(address creator) external view returns (uint256) {
         return creatorTokens[creator].length;
+    }
+
+   function getAllTokensWithInfo() external view returns (TokenInfo[] memory) {
+        TokenInfo[] memory tokensWithInfo = new TokenInfo[](allTokens.length);
+        
+        for (uint256 i = 0; i < allTokens.length; i++) {
+            BasicTokenInfo memory currentToken = allTokens[i];
+            address creatorAddress = currentToken.creator;
+            
+            CreatorInfo memory creator = creatorProfiles[creatorAddress][currentToken.symbol];
+            
+            require(bytes(creator.twitchUsername).length > 0, 
+                string(abi.encodePacked("No creator info found for token: ", currentToken.name)));
+            
+            tokensWithInfo[i] = TokenInfo({
+                basicInfo: currentToken,
+                creatorInfo: creator
+            });
+        }
+        
+        return tokensWithInfo;
     }
 }
