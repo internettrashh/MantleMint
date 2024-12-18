@@ -1,9 +1,11 @@
-
 import TokenSlider from './TokenSlider';
 import SearchBar from './SearchBar';
 import { Coins } from 'lucide-react';
+import { useTokenData } from '../../hooks/useTokenfetch';
 
 export default function LandingPage() {
+  const { tokens, isLoading, error } = useTokenData();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white">
       {/* Hero Section */}
@@ -46,6 +48,19 @@ export default function LandingPage() {
           </div>
         </div>
       </div>
+
+      {/* Token Display Section */}
+      {isLoading && <div>Loading tokens...</div>}
+      {error && <div>Error: {error}</div>}
+      {tokens && tokens.map((token, index) => (
+        <div key={token.basicInfo.tokenAddress || index}>
+          <h3>{token.basicInfo.name}</h3>
+          <p>Symbol: {token.basicInfo.symbol}</p>
+          <p>Address: {token.basicInfo.tokenAddress}</p>
+          <p>Creator: {token.basicInfo.creator}</p>
+          {/* Add other token information you want to display */}
+        </div>
+      ))}
     </div>
   );
 }

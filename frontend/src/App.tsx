@@ -15,7 +15,8 @@ export default function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/create" element={<CreateCoin />} />
-            <Route path="/token/:tokenId" element={<CreatorToken />} />
+            <Route path="/token/:tokenAddress" element={<CreatorToken />} />
+
             <Route path="/test" element={<AllTokens />} />
           </Routes>
         </main>

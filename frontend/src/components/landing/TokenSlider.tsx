@@ -2,8 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { useAllTokens } from '../../hooks/getAlltokens';
-import { TokenInfo } from '../../types/token';
+import { useTokenData } from '../../hooks/useTokenfetch';
 
 interface Token {
   id: string;
@@ -70,27 +69,51 @@ function InfiniteSlider({ tokens, direction = 'left', speed = 25 }: { tokens: To
   );
 }
 
+function Loader() {
+  return (
+    <div className="flex justify-center items-center min-h-[200px]">
+      <motion.div
+        className="w-16 h-16 border-4 border-blue-200 border-t-blue-500 rounded-full"
+        animate={{ rotate: 360 }}
+        transition={{
+          duration: 1,
+          repeat: Infinity,
+          ease: "linear"
+        }}
+      />
+    </div>
+  );
+}
+
 export default function TokenSlider() {
-  const { data, isLoading, isError } = useAllTokens();
+  const { tokens, isLoading, error } = useTokenData();
 
   if (isLoading) {
-    return <div>Loading tokens...</div>;
+    return <Loader />;
   }
-  if (isError) {
-    return <div>Error fetching tokens.</div>;
+  if (error) {
+    return (
+      <div className="text-center text-red-500 py-8">
+        Error fetching tokens: {error}
+      </div>
+    );
   }
-  if (!data || data.length === 0) {
-    return <div>No tokens found.</div>;
+  if (!tokens || tokens.length === 0) {
+    return (
+      <div className="text-center text-gray-500 py-8">
+        No tokens found.
+      </div>
+    );
   }
 
-  // Map TokenInfo to Token
-  const tokens: Token[] = data.map((tokenInfo) => ({
-    id: tokenInfo.tokenAddress,
-    name: tokenInfo.name,
-    ticker: tokenInfo.symbol,
-    price: tokenInfo.price || 1, // Ensure price is a number
-    change: tokenInfo.change || 1, // Ensure change is a number
-    imageUrl:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8NpMfUyVGsyIx4nUsYDwy7OrEDr4Z_2xYog&s', // Default image if not provided
+  // Map TokenInfo to Token with the new structure
+  const formattedTokens: Token[] = tokens.map((tokenInfo) => ({
+    id: tokenInfo.basicInfo.tokenAddress,
+    name: tokenInfo.basicInfo.name,
+    ticker: tokenInfo.basicInfo.symbol,
+    price: 1, // You might want to get this from somewhere else
+    change: 0, // You might want to get this from somewhere else
+    imageUrl: tokenInfo.creatorInfo.profileImageUrl || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8NpMfUyVGsyIx4nUsYDwy7OrEDr4Z_2xYog&s',
   }));
 
   return (
@@ -101,8 +124,8 @@ export default function TokenSlider() {
       
       {/* Sliders */}
       <div className="space-y-8">
-        <InfiniteSlider direction="left" speed={30} tokens={tokens} />
-        <InfiniteSlider direction="right" speed={25} tokens={tokens} />
+        <InfiniteSlider direction="left" speed={30} tokens={formattedTokens} />
+        <InfiniteSlider direction="right" speed={25} tokens={formattedTokens} />
       </div>
     </div>
   );

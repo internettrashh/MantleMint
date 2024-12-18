@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import  { useEffect, useRef } from 'react';
 import { TokenInfo } from '../../types/token';
-import { createChart, ColorType, IChartApi } from 'lightweight-charts';
+import { createChart, IChartApi } from 'lightweight-charts';
 import { BondingCurveCalculator } from '../../utils/bondingCurve';
 
 interface PriceChartProps {
@@ -46,7 +46,7 @@ export default function PriceChart({ tokenInfo }: PriceChartProps) {
         value: price,
       });
     }
-
+    // @ts-ignore
     series.setData(data);
     chartRef.current = chart;
 
